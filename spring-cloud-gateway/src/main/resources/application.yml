@@ -1,0 +1,43 @@
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: posts-route
+          uri: ${POST_ROUTE_URI:lb://posts}
+          predicates:
+            - Path=/posts/**
+          filters:
+            - PrefixPath=/api
+            - AddResponseHeader=X-Powered-By,Mawen Gateway Service
+        - id: comments-route
+          uri: lb://comments
+          predicates:
+            - Path=/comments/**
+          filters:
+            - PrefixPath=/api
+            - AddResponseHeader=X-Powered-By,Mawen Gateway Service
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: gateway
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway.filter: TRACE
+    org.springframework.http.server.reactive: DEBUG
+    org.springframework.web.reactive: DEBUG
+    reactor.ipc.netty: DEBUG
+    reactor.netty: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    gateway:
+      enabled: true
