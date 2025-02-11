@@ -19,8 +19,11 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    loadbalancer:
+      configurations: zone-preference
   application:
     name: gateway
+
 
 logging:
   level:

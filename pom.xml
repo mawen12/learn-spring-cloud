@@ -25,6 +25,8 @@
         <module>mawen-comments</module>
         <module>spring-cloud-enhanced</module>
         <module>spring-demo</module>
+        <module>example</module>
+        <module>example/nacos</module>
     </modules>
 
     <properties>
