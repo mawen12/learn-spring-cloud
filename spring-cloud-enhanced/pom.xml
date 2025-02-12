@@ -14,6 +14,8 @@
     <modules>
         <module>feign-controller</module>
         <module>zone-forward</module>
+        <module>hello</module>
+        <module>zone-forward-starter</module>
     </modules>
 
     <properties>

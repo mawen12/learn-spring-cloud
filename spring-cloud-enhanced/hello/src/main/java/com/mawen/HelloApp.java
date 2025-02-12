@@ -1,15 +1,12 @@
-package com.mawen.enhanded.zone;
-
+package com.mawen;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
 
-@EnableFeignClients
 @SpringBootApplication
-public class ZoneApp {
+public class HelloApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(ZoneApp.class, args);
+        SpringApplication.run(HelloApp.class, args);
     }
 }
