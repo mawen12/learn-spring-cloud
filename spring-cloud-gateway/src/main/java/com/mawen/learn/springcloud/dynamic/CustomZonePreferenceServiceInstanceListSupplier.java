@@ -1,5 +1,7 @@
 package com.mawen.learn.springcloud.dynamic;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.loadbalancer.DefaultRequest;
 import org.springframework.cloud.client.loadbalancer.Request;
@@ -14,28 +16,41 @@ import reactor.core.publisher.Flux;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class CustomZonePreferenceServiceInstanceListSupplier extends ZonePreferenceServiceInstanceListSupplier {
 
+    private static final Logger log = LoggerFactory.getLogger(CustomZonePreferenceServiceInstanceListSupplier.class);
+
     private boolean callGetWithRequestOnDelegates;
+
+    private LoadBalancerZoneConfig zoneConfig;
 
     public CustomZonePreferenceServiceInstanceListSupplier(ServiceInstanceListSupplier delegate, LoadBalancerZoneConfig zoneConfig) {
         super(delegate, zoneConfig);
+        this.zoneConfig = zoneConfig;
     }
 
-    public CustomZonePreferenceServiceInstanceListSupplier(ServiceInstanceListSupplier delegate, LoadBalancerZoneConfig zoneConfig, ReactiveLoadBalancer.Factory<ServiceInstance> loadBalancerClientFactory) {
+    public CustomZonePreferenceServiceInstanceListSupplier(ServiceInstanceListSupplier delegate, LoadBalancerZoneConfig zoneConfig,
+                                                           ReactiveLoadBalancer.Factory<ServiceInstance> loadBalancerClientFactory) {
         super(delegate, zoneConfig, loadBalancerClientFactory);
         callGetWithRequestOnDelegates = loadBalancerClientFactory.getProperties(getServiceId())
                 .isCallGetWithRequestOnDelegates();
+        this.zoneConfig = zoneConfig;
     }
 
     @Override
     public Flux<List<ServiceInstance>> get(Request request) {
         if (callGetWithRequestOnDelegates) {
-            final String zoneFromHeader = getZoneFromHeader(request);
-            return getDelegate().get(request).map(instances -> filteredByCustomZone(zoneFromHeader, instances));
+            Optional<String> zoneOptional = Optional.ofNullable(getZoneFromHeader(request));
+            return getDelegate().get(request).map(instances -> filteredByCustomZone(zoneOptional.orElse(zoneConfig.getZone()), instances));
         }
         return get();
+    }
+
+    @Override
+    public Flux<List<ServiceInstance>> get() {
+        return (this.getDelegate().get()).map(instances -> filteredByCustomZone(zoneConfig.getZone(), instances));
     }
 
     private List<ServiceInstance> filteredByCustomZone(String zone, List<ServiceInstance> serviceInstances) {

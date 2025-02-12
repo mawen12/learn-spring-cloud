@@ -16,6 +16,12 @@ spring:
           filters:
             - PrefixPath=/api
             - AddResponseHeader=X-Powered-By,Mawen Gateway Service
+        - id: zone-route
+          uri: lb://zone
+          predicates:
+            - Path=/zone/**
+          filters:
+            - PrefixPath=/api
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
